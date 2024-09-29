@@ -1,16 +1,15 @@
 import os
 import time
-from urllib.parse import _QueryType
 from telegraph import upload_file # type: ignore
 import random, string
 import asyncio
 import datetime
-import requests
+import requests # type: ignore
 from time import time as time_now
-from pyrogram import Client, filters, enums
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from pyrogram.errors import FloodWait
-from database.ia_filterdb import Media, delete_files, get_file_details
+from pyrogram import Client, filters, enums # type: ignore
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup # type: ignore
+from pyrogram.errors import FloodWait # type: ignore
+from database.ia_filterdb import Media, delete_files, get_file_details, unpack_new_file_id
 from database.users_chats_db import db
 from utils import (
     get_seconds, get_settings, get_size, get_verify_status, is_check_admin, save_group_settings, temp, 
