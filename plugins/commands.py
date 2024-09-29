@@ -1,11 +1,6 @@
 import os
-import logging
-import pyrogram
-import json
-import base64
-import sys
-from plugins.pm_filter import REACTIONS
-from shortzy import Shortzy # type: ignore
+import time
+from urllib.parse import _QueryType
 from telegraph import upload_file # type: ignore
 import random, string
 import asyncio
@@ -15,15 +10,15 @@ from time import time as time_now
 from pyrogram import Client, filters, enums
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.errors import FloodWait
-from database.ia_filterdb import get_file_details
+from database.ia_filterdb import Media, delete_files, get_file_details
 from database.users_chats_db import db
 from utils import (
-    get_settings, get_size, get_verify_status, temp, 
+    get_seconds, get_settings, get_size, get_verify_status, is_check_admin, save_group_settings, temp, 
     update_verify_status, get_readable_time, 
     is_subscribed, get_wish, get_shortlink
 )
 from info import (
-    INDEX_CHANNELS, STICKERS_IDS, SUPPORT_GROUP, UPDATES_LINK, 
+    ADMINS, DELETE_TIME, INDEX_CHANNELS, STICKERS_IDS, SUPPORT_GROUP, UPDATES_LINK, 
     SUPPORT_LINK, VERIFY_TUTORIAL, VERIFY_EXPIRE, 
     LOG_CHANNEL, PICS, SHORTLINK_API, SHORTLINK_URL,
     OWNER_USERNAME, PAYMENT_QR, OWNER_UPI_ID, PM_FILE_DELETE_TIME,
@@ -105,12 +100,13 @@ async def start(client, message):
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
         await message.reply_photo(
-            photo=random.choice(PICS),
-            caption=script.START_TXT.format(message.from_user.mention, get_wish()),
-            reply_markup=InlineKeyboardMarkup(buttons)
-            parse_mode=enums.parseMode.HTML
+        photo=random.choice(PICS),
+        caption=script.START_TXT.format(message.from_user.mention, get_wish()),
+        reply_markup=InlineKeyboardMarkup(buttons),
+        parse_mode=enums.ParseMode.HTML
         )
         return
+
     if len(message.command) == 2 and message.command[1] == "plans":
         btn = [            
             [InlineKeyboardButton("ꜱᴇɴᴅ ᴘᴀʏᴍᴇɴᴛ ʀᴇᴄᴇɪᴘᴛ 🧾", url=OWNER_USERNAME)],
@@ -747,7 +743,7 @@ async def remove_fsub(client, message):
     if not await is_check_admin(client, grp_id, user_id):
         return await message.reply_text('You not admin in this group.')
     if not settings['fsub']:
-        await query.answer("ʏᴏᴜ ᴅɪᴅɴ'ᴛ ᴀᴅᴅᴇᴅ ᴀɴʏ ꜰᴏʀᴄᴇ sᴜʙsᴄʀɪʙᴇ ᴄʜᴀɴɴᴇʟ...", show_alert=True)
+        await _QueryType.answer("ʏᴏᴜ ᴅɪᴅɴ'ᴛ ᴀᴅᴅᴇᴅ ᴀɴʏ ꜰᴏʀᴄᴇ sᴜʙsᴄʀɪʙᴇ ᴄʜᴀɴɴᴇʟ...", show_alert=True)
         return
     await save_group_settings(grp_id, 'fsub', None)
     await message.reply_text("<b>Successfully removed your force channel id...</b>")
