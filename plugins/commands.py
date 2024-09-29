@@ -190,18 +190,15 @@ async def start(client, message):
                     InlineKeyboardButton('⁉️ ᴄʟᴏsᴇ ⁉️', callback_data='close_data')
                 ]]
 
-        try:
-            msg = await client.send_cached_media(
+        await client.send_cached_media(
                 chat_id=message.from_user.id,
                 file_id=file.file_id,
                 caption=f_caption,
                 protect_content=settings['file_secure'],
                 reply_markup=InlineKeyboardMarkup(btn)
             )
-            file_ids.append(msg.id)
-        except Exception as e:
-            print(f"Error sending cached media: {e}")
-                    # आप यहाँ पर अधिक जानकारी प्रिंट कर सकते हैं, जैसे कि file.file_id
+        return
+
 
 
         time = get_readable_time(PM_FILE_DELETE_TIME)
@@ -254,7 +251,7 @@ async def start(client, message):
         ],[
             InlineKeyboardButton('⁉️ ᴄʟᴏsᴇ ⁉️', callback_data='close_data')
         ]]
-    vp = await client.send_cached_media(
+    await client.send_cached_media(
         chat_id=message.from_user.id,
         file_id=file_id,
         caption=f_caption,
