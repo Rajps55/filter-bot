@@ -83,7 +83,7 @@ async def start(client, message):
                     InlineKeyboardButton('📚 ᴀʙᴏᴜᴛ', callback_data='about')
                 ],[
                     InlineKeyboardButton('💰 ᴇᴀʀɴ ᴜɴʟɪᴍɪᴛᴇᴅ ᴍᴏɴᴇʏ ʙʏ ʙᴏᴛ 💰', callback_data='earn')
-                  ]]
+                ]]
         reply_markup = InlineKeyboardMarkup(buttons)
         await message.reply_photo(
             photo=random.choice(PICS),
@@ -188,9 +188,9 @@ async def start(client, message):
                     InlineKeyboardButton('⁉️ ᴄʟᴏsᴇ ⁉️', callback_data='close_data')
                 ]]
 
-            await client.send_cached_media(
+            msg = await client.send_cached_media(
                 chat_id=message.from_user.id,
-                file_id=file.file_id,
+                file_id=file.file_id,  # Potential Issue
                 caption=f_caption,
                 protect_content=settings['file_secure'],
                 reply_markup=InlineKeyboardMarkup(btn)
@@ -247,7 +247,7 @@ async def start(client, message):
         ],[
             InlineKeyboardButton('⁉️ ᴄʟᴏsᴇ ⁉️', callback_data='close_data')
         ]]
-    await client.send_cached_media(
+    msg = await client.send_cached_media(
         chat_id=message.from_user.id,
         file_id=file.file_id,
         caption=f_caption,
