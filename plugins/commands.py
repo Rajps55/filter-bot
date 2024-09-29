@@ -250,11 +250,6 @@ async def start(client, message):
         ]]
     async def get_file_from_db(file_id):
         return await db['files'].find_one({"file_id": file_id}) 
-    
-    file = await get_file_from_database_or_some_function()
-    if not file or not file.file_id:
-        await message.reply("Error: The file ID is invalid or the file is unavailable.")
-        return
     try:
         vp = await client.send_cached_media(
             chat_id=message.from_user.id,
