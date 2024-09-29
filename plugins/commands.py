@@ -248,13 +248,21 @@ async def start(client, message):
         ],[
             InlineKeyboardButton('⁉️ ᴄʟᴏsᴇ ⁉️', callback_data='close_data')
         ]]
-    vp = await client.send_cached_media(
-        chat_id=message.from_user.id,
-        file_id=file_id,
-        caption=f_caption,
-        protect_content=settings['file_secure'],
-        reply_markup=InlineKeyboardMarkup(btn)
+        
+    if not file or not file.file_id:
+        await message.reply("Error: The file ID is invalid or the file is unavailable.")
+        return
+    try:
+        vp = await client.send_cached_media(
+            chat_id=message.from_user.id,
+            file_id=file_id,
+            caption=f_caption,
+            protect_content=settings['file_secure'],
+            reply_markup=InlineKeyboardMarkup(btn)
     )
+    except pyrogram.errors.MediaEmpty:
+        await message.reply("Error: The media is empty or not valid. Please try again with a different file.")
+        
     time = get_readable_time(PM_FILE_DELETE_TIME)
     msg = await vp.reply(f"Nᴏᴛᴇ: Tʜɪs ᴍᴇssᴀɢᴇ ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇ ɪɴ {time} ᴛᴏ ᴀᴠᴏɪᴅ ᴄᴏᴘʏʀɪɢʜᴛs. Sᴀᴠᴇ ᴛʜᴇ ғɪʟᴇ ᴛᴏ sᴏᴍᴇᴡʜᴇʀᴇ ᴇʟsᴇ")
     await asyncio.sleep(PM_FILE_DELETE_TIME)
