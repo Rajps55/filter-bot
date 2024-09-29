@@ -1,6 +1,6 @@
 import os
-import pyrogram
 import logging
+import pyrogram
 import json
 import base64
 import sys
@@ -172,7 +172,7 @@ async def start(client, message):
                 file_name=file.file_name,
                 file_size=get_size(file.file_size),
                 file_caption=file.caption
-            )   
+            )      
             if settings.get('is_stream', IS_STREAM):
                 btn = [[
                     InlineKeyboardButton("✛ ᴡᴀᴛᴄʜ & ᴅᴏᴡɴʟᴏᴀᴅ ✛", callback_data=f"stream#{file.file_id}")
@@ -249,19 +249,13 @@ async def start(client, message):
         ],[
             InlineKeyboardButton('⁉️ ᴄʟᴏsᴇ ⁉️', callback_data='close_data')
         ]]
-    async def get_file_from_db(file_id):
-        return await db['files'].find_one({"file_id": file_id}) 
-    try:
-        vp = await client.send_cached_media(
-            chat_id=message.from_user.id,
-            file_id=file_id,
-            caption=f_caption,
-            protect_content=settings['file_secure'],
-            reply_markup=InlineKeyboardMarkup(btn)
+    vp = await client.send_cached_media(
+        chat_id=message.from_user.id,
+        file_id=file_id,
+        caption=f_caption,
+        protect_content=settings['file_secure'],
+        reply_markup=InlineKeyboardMarkup(btn)
     )
-    except pyrogram.errors.MediaEmpty:
-        await message.reply("Error: The media is empty or not valid. Please try again with a different file.")
-        
     time = get_readable_time(PM_FILE_DELETE_TIME)
     msg = await vp.reply(f"Nᴏᴛᴇ: Tʜɪs ᴍᴇssᴀɢᴇ ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇ ɪɴ {time} ᴛᴏ ᴀᴠᴏɪᴅ ᴄᴏᴘʏʀɪɢʜᴛs. Sᴀᴠᴇ ᴛʜᴇ ғɪʟᴇ ᴛᴏ sᴏᴍᴇᴡʜᴇʀᴇ ᴇʟsᴇ")
     await asyncio.sleep(PM_FILE_DELETE_TIME)
@@ -669,7 +663,7 @@ async def check_plans_cmd(client, message):
         ]
         reply_markup = InlineKeyboardMarkup(btn)
         m=await message.reply_sticker("CAACAgIAAxkBAAIBTGVjQbHuhOiboQsDm35brLGyLQ28AAJ-GgACglXYSXgCrotQHjibHgQ")         
-        await message.reply_text(f"**😢 You Don't Have Any Premium Subscription.\n\n Check Out Our Premium /plans**",reply_markup=reply_markup)
+        await message.reply_text(f"**😢 You Don't Have Any Premium Subscription.\n\n Check Out Our Premium /plan**",reply_markup=reply_markup)
         await asyncio.sleep(2)
         await m.delete()
 
