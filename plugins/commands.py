@@ -249,6 +249,7 @@ async def start(client, message):
             InlineKeyboardButton('⁉️ ᴄʟᴏsᴇ ⁉️', callback_data='close_data')
         ]]
         
+    file = await get_file_from_database_or_some_function()
     if not file or not file.file_id:
         await message.reply("Error: The file ID is invalid or the file is unavailable.")
         return
