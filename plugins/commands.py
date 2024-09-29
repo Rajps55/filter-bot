@@ -1,4 +1,5 @@
 import os
+import pyrogram
 import logging
 import json
 import base64
