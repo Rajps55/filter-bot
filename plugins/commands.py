@@ -1,6 +1,13 @@
 import os
-import random
-import string
+import logging
+import pyrogram
+import json
+import base64
+import sys
+from plugins.pm_filter import REACTIONS
+from shortzy import Shortzy # type: ignore
+from telegraph import upload_file # type: ignore
+import random, string
 import asyncio
 import datetime
 import requests
@@ -8,15 +15,15 @@ from time import time as time_now
 from pyrogram import Client, filters, enums
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.errors import FloodWait
-from database.ia_filterdb import Media, get_file_details
+from database.ia_filterdb import get_file_details
 from database.users_chats_db import db
 from utils import (
-    get_settings, get_size, get_verify_status, is_check_admin, save_group_settings, 
+    get_settings, get_size, get_verify_status, temp, 
     update_verify_status, get_readable_time, 
     is_subscribed, get_wish, get_shortlink
 )
 from info import (
-    ADMINS, INDEX_CHANNELS, STICKERS_IDS, SUPPORT_GROUP, UPDATES_LINK, 
+    STICKERS_IDS, SUPPORT_GROUP, UPDATES_LINK, 
     SUPPORT_LINK, VERIFY_TUTORIAL, VERIFY_EXPIRE, 
     LOG_CHANNEL, PICS, SHORTLINK_API, SHORTLINK_URL,
     OWNER_USERNAME, PAYMENT_QR, OWNER_UPI_ID, PM_FILE_DELETE_TIME,
@@ -46,12 +53,13 @@ async def aiRes(client, message):
     if res.status_code == 200:
         response = res.json().get("response", "No response received!")
         await thinkStc.delete()
-        await message.reply(f"<b>Hey {message.from_user.mention()},\n{response.strip()}</b>")
+        await message.reply(f"<b>Hey {message.from_user.mention()},\n{response.strip()if response.startswith(' ') else response}</b>")
     else:
-        await thinkStc.delete()
-        await message.reply("API issue! Please try again later or report to the developer.")
-
-
+        btn = [[
+            InlineKeyboardButton('💡 sᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ 💡', url=SUPPORT_LINK)
+        ]]
+        await message.reply(f"<b>hey {message.from_user.mention},\n\nPlease use this command in support group.</b>", reply_markup=InlineKeyboardMarkup(btn))
+        
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
     bot_id = client.me.id
@@ -99,8 +107,9 @@ async def start(client, message):
         photo=random.choice(PICS),
         caption=script.START_TXT.format(message.from_user.mention, get_wish()),
         reply_markup=InlineKeyboardMarkup(buttons)
+        parse_mode=enums.parseMode.HTML
     )
-
+    return
 
 @Client.on_message(filters.command("verify") & filters.incoming)
 async def verify(client, message):
@@ -204,16 +213,14 @@ async def verify(client, message):
                     InlineKeyboardButton('⁉️ ᴄʟᴏsᴇ ⁉️', callback_data='close_data')
                 ]]
 
-        await client.send_cached_media(
+            msg = await client.send_cached_media(
                 chat_id=message.from_user.id,
                 file_id=file.file_id,
                 caption=f_caption,
                 protect_content=settings['file_secure'],
                 reply_markup=InlineKeyboardMarkup(btn)
             )
-        return
-
-
+            file_ids.append(msg.id)
 
         time = get_readable_time(PM_FILE_DELETE_TIME)
         vp = await message.reply(f"Nᴏᴛᴇ: Tʜɪs ғɪʟᴇs ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇ ɪɴ {time} ᴛᴏ ᴀᴠᴏɪᴅ ᴄᴏᴘʏʀɪɢʜᴛs. Sᴀᴠᴇ ᴛʜᴇ ғɪʟᴇs ᴛᴏ sᴏᴍᴇᴡʜᴇʀᴇ ᴇʟsᴇ")
@@ -272,15 +279,9 @@ async def verify(client, message):
         protect_content=settings['file_secure'],
         reply_markup=InlineKeyboardMarkup(btn)
     )
-    time = get_readable_time(PM_FILE_DELETE_TIME)
-    msg = await vp.reply(f"Nᴏᴛᴇ: Tʜɪs ᴍᴇssᴀɢᴇ ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇ ɪɴ {time} ᴛᴏ ᴀᴠᴏɪᴅ ᴄᴏᴘʏʀɪɢʜᴛs. Sᴀᴠᴇ ᴛʜᴇ ғɪʟᴇ ᴛᴏ sᴏᴍᴇᴡʜᴇʀᴇ ᴇʟsᴇ")
+    
     await asyncio.sleep(PM_FILE_DELETE_TIME)
-    btns = [[
-        InlineKeyboardButton('ɢᴇᴛ ғɪʟᴇ ᴀɢᴀɪɴ', callback_data=f"get_del_file#{grp_id}#{file_id}")
-    ]]
-    await msg.delete()
-    await vp.delete()
-    await vp.reply("Tʜᴇ ғɪʟᴇ ʜᴀs ʙᴇᴇɴ ɢᴏɴᴇ ! Cʟɪᴄᴋ ɢɪᴠᴇɴ ʙᴜᴛᴛᴏɴ ᴛᴏ ɢᴇᴛ ɪᴛ ᴀɢᴀɪɴ.", reply_markup=InlineKeyboardMarkup(btns))
+    await message.reply("The file has been deleted to avoid copyright issues.")
 
 @Client.on_message(filters.command('index_channels'))
 async def channels_info(bot, message):
