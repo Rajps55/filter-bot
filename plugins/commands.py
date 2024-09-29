@@ -3,6 +3,7 @@ import logging
 import json
 import base64
 import sys
+from plugins.pm_filter import REACTIONS
 from shortzy import Shortzy
 from telegraph import upload_file
 import random, string
@@ -190,7 +191,7 @@ async def start(client, message):
 
             msg = await client.send_cached_media(
                 chat_id=message.from_user.id,
-                file_id=file.file_id,  # Potential Issue
+                file_id=file.file_id,
                 caption=f_caption,
                 protect_content=settings['file_secure'],
                 reply_markup=InlineKeyboardMarkup(btn)
@@ -222,9 +223,9 @@ async def start(client, message):
             ],[
                 InlineKeyboardButton("📍 ʜᴏᴡ ᴛᴏ ᴏᴘᴇɴ ʟɪɴᴋ 📍", url=settings['tutorial'])
             ]]
-            await message.reply(f"[{get_size(files.file_size)}] {files.file_name}\n\nYour file is ready, Please get using this link. 👍", reply_markup=InlineKeyboardMarkup(btn), protect_content=settings['file_secure'])
+            await message.reply(f"[{get_size(files.file_size)}] {files.file_name}\n\nYour file is ready, Please get using this link. 👍", reply_markup=InlineKeyboardMarkup(btn), protect_content=True)
             return
-        
+            
     CAPTION = settings['caption']
     f_caption = CAPTION.format(
         file_name = files.file_name,
@@ -247,9 +248,9 @@ async def start(client, message):
         ],[
             InlineKeyboardButton('⁉️ ᴄʟᴏsᴇ ⁉️', callback_data='close_data')
         ]]
-    msg = await client.send_cached_media(
+    vp = await client.send_cached_media(
         chat_id=message.from_user.id,
-        file_id=file.file_id,
+        file_id=file_id,
         caption=f_caption,
         protect_content=settings['file_secure'],
         reply_markup=InlineKeyboardMarkup(btn)
