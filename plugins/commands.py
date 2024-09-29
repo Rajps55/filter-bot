@@ -23,7 +23,7 @@ from utils import (
     is_subscribed, get_wish, get_shortlink
 )
 from info import (
-    STICKERS_IDS, SUPPORT_GROUP, UPDATES_LINK, 
+    INDEX_CHANNELS, STICKERS_IDS, SUPPORT_GROUP, UPDATES_LINK, 
     SUPPORT_LINK, VERIFY_TUTORIAL, VERIFY_EXPIRE, 
     LOG_CHANNEL, PICS, SHORTLINK_API, SHORTLINK_URL,
     OWNER_USERNAME, PAYMENT_QR, OWNER_UPI_ID, PM_FILE_DELETE_TIME,
@@ -81,7 +81,7 @@ async def start(client, message):
         user = message.from_user.mention if message.from_user else "Dear"
         btn = [
             [InlineKeyboardButton('⚡️ Updates Channel ⚡️', url=UPDATES_LINK),
-             InlineKeyboardButton('💡 Support Group 💡', url=SUPPORT_LINK)]
+            InlineKeyboardButton('💡 Support Group 💡', url=SUPPORT_LINK)]
         ]
         await message.reply(f"<b>Hey {user}, {wish}\nHow can I help you?</b>", 
                             reply_markup=InlineKeyboardMarkup(btn))
@@ -95,29 +95,22 @@ async def start(client, message):
     verify_status = await get_verify_status(message.from_user.id)
     if verify_status['is_verified'] and datetime.datetime.now() > verify_status['expire_time']:
         await update_verify_status(message.from_user.id, is_verified=False)
-
-    buttons = [
+        
+    if (len(message.command) != 2) or (len(message.command) == 2 and message.command[1] == 'start'):
+        buttons = [[
         [InlineKeyboardButton("+ Add me to your group +", url=f'http://t.me/{client.me.username}?startgroup=true')],
         [InlineKeyboardButton('ℹ️ Updates', url=UPDATES_LINK), InlineKeyboardButton('🧑‍💻 Support', url=SUPPORT_LINK)],
         [InlineKeyboardButton('👨‍🚒 Help', callback_data='help'), InlineKeyboardButton('📚 About', callback_data='about')],
         [InlineKeyboardButton('💰 Earn Unlimited Money 💰', callback_data='earn')]
-    ]
-    reply_markup = InlineKeyboardMarkup(buttons)
-    await message.reply_photo(
-        photo=random.choice(PICS),
-        caption=script.START_TXT.format(message.from_user.mention, get_wish()),
-        reply_markup=InlineKeyboardMarkup(buttons)
-        parse_mode=enums.parseMode.HTML
-    )
-    return
-
-@Client.on_message(filters.command("verify") & filters.incoming)
-async def verify(client, message):
-    verify_status = await get_verify_status(message.from_user.id)
-    if verify_status["is_verified"]:
-        await message.reply(f"✅ You are already verified until: {get_readable_time(VERIFY_EXPIRE)}")
+        ]]
+        reply_markup = InlineKeyboardMarkup(buttons)
+        await message.reply_photo(
+            photo=random.choice(PICS),
+            caption=script.START_TXT.format(message.from_user.mention, get_wish()),
+            reply_markup=InlineKeyboardMarkup(buttons)
+            parse_mode=enums.parseMode.HTML
+        )
         return
-
     if len(message.command) == 2 and message.command[1] == "plans":
         btn = [            
             [InlineKeyboardButton("ꜱᴇɴᴅ ᴘᴀʏᴍᴇɴᴛ ʀᴇᴄᴇɪᴘᴛ 🧾", url=OWNER_USERNAME)],
@@ -272,16 +265,22 @@ async def verify(client, message):
         ],[
             InlineKeyboardButton('⁉️ ᴄʟᴏsᴇ ⁉️', callback_data='close_data')
         ]]
-    await client.send_cached_media(
+    vp = await client.send_cached_media(
         chat_id=message.chat.id,
         file_id=file.file_id,
         caption=f_caption,
         protect_content=settings['file_secure'],
         reply_markup=InlineKeyboardMarkup(btn)
     )
-    
+    time = get_readable_time(PM_FILE_DELETE_TIME)
+    msg = await vp.reply(f"Nᴏᴛᴇ: Tʜɪs ᴍᴇssᴀɢᴇ ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇ ɪɴ {time} ᴛᴏ ᴀᴠᴏɪᴅ ᴄᴏᴘʏʀɪɢʜᴛs. Sᴀᴠᴇ ᴛʜᴇ ғɪʟᴇ ᴛᴏ sᴏᴍᴇᴡʜᴇʀᴇ ᴇʟsᴇ")
     await asyncio.sleep(PM_FILE_DELETE_TIME)
-    await message.reply("The file has been deleted to avoid copyright issues.")
+    btns = [[
+        InlineKeyboardButton('ɢᴇᴛ ғɪʟᴇ ᴀɢᴀɪɴ', callback_data=f"get_del_file#{grp_id}#{file_id}")
+    ]]
+    await msg.delete()
+    await vp.delete()
+    await vp.reply("Tʜᴇ ғɪʟᴇ ʜᴀs ʙᴇᴇɴ ɢᴏɴᴇ ! Cʟɪᴄᴋ ɢɪᴠᴇɴ ʙᴜᴛᴛᴏɴ ᴛᴏ ɢᴇᴛ ɪᴛ ᴀɢᴀɪɴ.", reply_markup=InlineKeyboardMarkup(btns))
 
 @Client.on_message(filters.command('index_channels'))
 async def channels_info(bot, message):
