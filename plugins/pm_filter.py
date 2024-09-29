@@ -624,6 +624,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             InlineKeyboardButton('💰 ᴇᴀʀɴ ᴜɴʟɪᴍɪᴛᴇᴅ ᴍᴏɴᴇʏ ʙʏ ʙᴏᴛ 💰', callback_data='earn')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
+    if query.message.text != new_content
         await query.message.edit_text(
             text=script.START_TXT.format(query.from_user.mention, get_wish()),
             reply_markup=reply_markup,
