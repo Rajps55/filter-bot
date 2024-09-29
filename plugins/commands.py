@@ -1,71 +1,85 @@
 import os
-import logging
-import pyrogram
-import json
-import base64
-import sys
-from plugins.pm_filter import REACTIONS
-from shortzy import Shortzy
-from telegraph import upload_file
-import random, string
+import random
+import string
 import asyncio
-from time import time as time_now
 import datetime
-from Script import script
-from pyrogram import Client, filters, enums
-from pyrogram.errors import ChatAdminRequired, FloodWait, ButtonDataInvalid
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from database.ia_filterdb import Media, get_file_details, unpack_new_file_id, delete_files
-from database.users_chats_db import db
-from info import STICKERS_IDS,SUPPORT_GROUP ,INDEX_CHANNELS, ADMINS, IS_VERIFY, VERIFY_TUTORIAL, VERIFY_EXPIRE, TUTORIAL, SHORTLINK_API, SHORTLINK_URL, AUTH_CHANNEL, DELETE_TIME, SUPPORT_LINK, UPDATES_LINK, LOG_CHANNEL, PICS, PROTECT_CONTENT, IS_STREAM, IS_FSUB, PAYMENT_QR, OWNER_USERNAME, PM_FILE_DELETE_TIME, OWNER_UPI_ID
-from utils import get_settings, get_size, is_subscribed, is_check_admin, get_shortlink, get_verify_status, update_verify_status, save_group_settings, temp, get_readable_time, get_wish, get_seconds
 import requests
-from telegraph import upload_file
+from time import time as time_now
+from pyrogram import Client, filters, enums
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.errors import FloodWait
+from database.ia_filterdb import Media, get_file_details
+from database.users_chats_db import db
+from utils import (
+    get_settings, get_size, get_verify_status, is_check_admin, save_group_settings, 
+    update_verify_status, get_readable_time, 
+    is_subscribed, get_wish, get_shortlink
+)
+from info import (
+    ADMINS, INDEX_CHANNELS, STICKERS_IDS, SUPPORT_GROUP, UPDATES_LINK, 
+    SUPPORT_LINK, VERIFY_TUTORIAL, VERIFY_EXPIRE, 
+    LOG_CHANNEL, PICS, SHORTLINK_API, SHORTLINK_URL,
+    OWNER_USERNAME, PAYMENT_QR, OWNER_UPI_ID, PM_FILE_DELETE_TIME,
+    IS_STREAM, IS_VERIFY
+)
+from Script import script
 
-@Client.on_message(filters.command("ask") & filters.incoming) #add your support grp
-async def aiRes(_, message):
-    if message.chat.id == SUPPORT_GROUP:
+
+@Client.on_message(filters.command("ask") & filters.incoming)
+async def aiRes(client, message):
+    if message.chat.id != SUPPORT_GROUP:
+        btn = [[InlineKeyboardButton('💡 Support Group 💡', url=SUPPORT_LINK)]]
+        await message.reply(f"<b>Hey {message.from_user.mention}, please use this command in the support group.</b>", 
+                            reply_markup=InlineKeyboardMarkup(btn))
+        return
+
+    try:
         asked = message.text.split(None, 1)[1]
-        if not asked:
-            return await message.reply("Bhai kuch puch to le /ask k baad !")
-        thinkStc = await message.reply_sticker(sticker=random.choice(STICKERS_IDS))
-        url = f"https://bisal-ai-api.vercel.app/biisal" 
-        res = requests.post(url , data={'query' : asked})
-        if res.status_code == 200:
-            response = res.json().get("response")
-            await thinkStc.delete()
-            await message.reply(f"<b>hey {message.from_user.mention()},\n{response.lstrip() if response.startswith(' ') else response}</b>")
-        else:
-            await thinkStc.delete()
-            await message.reply("Mausam kharab hai ! Thode der mein try kre !\nor Report to Developer.")
+    except IndexError:
+        await message.reply("Please ask a question after /ask!")
+        return
+    
+    thinkStc = await message.reply_sticker(sticker=random.choice(STICKERS_IDS))
+    url = "https://bisal-ai-api.vercel.app/biisal"
+    res = requests.post(url, data={'query': asked})
+    
+    if res.status_code == 200:
+        response = res.json().get("response", "No response received!")
+        await thinkStc.delete()
+        await message.reply(f"<b>Hey {message.from_user.mention()},\n{response.strip()}</b>")
     else:
-        btn = [[
-            InlineKeyboardButton('💡 sᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ 💡', url=SUPPORT_LINK)
-        ]]
-        await message.reply(f"<b>hey {message.from_user.mention},\n\nPlease use this command in support group.</b>", reply_markup=InlineKeyboardMarkup(btn))
-        
+        await thinkStc.delete()
+        await message.reply("API issue! Please try again later or report to the developer.")
+
+
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
-    botid = client.me.id
+    bot_id = client.me.id
     try:
-        await message.react(emoji=random.choice(REACTIONS), big=True)
-    except:
+        await message.react(emoji=random.choice(STICKERS_IDS), big=True)
+    except FloodWait as e:
+        await asyncio.sleep(e.value)
         await message.react(emoji="⚡️", big=True)
+
     if message.chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
         if not await db.get_chat(message.chat.id):
-            total = await client.get_chat_members_count(message.chat.id)
+            total_members = await client.get_chat_members_count(message.chat.id)
             username = f'@{message.chat.username}' if message.chat.username else 'Private'
-            await client.send_message(LOG_CHANNEL, script.NEW_GROUP_TXT.format(message.chat.title, message.chat.id, username, total))       
+            await client.send_message(LOG_CHANNEL, script.NEW_GROUP_TXT.format(
+                message.chat.title, message.chat.id, username, total_members))
             await db.add_chat(message.chat.id, message.chat.title)
+        
         wish = get_wish()
         user = message.from_user.mention if message.from_user else "Dear"
-        btn = [[
-            InlineKeyboardButton('⚡️ ᴜᴘᴅᴀᴛᴇs ᴄʜᴀɴɴᴇʟ ⚡️', url=UPDATES_LINK),
-            InlineKeyboardButton('💡 sᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ 💡', url=SUPPORT_LINK)
-        ]]
-        await message.reply(text=f"<b>ʜᴇʏ {user}, <i>{wish}</i>\nʜᴏᴡ ᴄᴀɴ ɪ ʜᴇʟᴘ ʏᴏᴜ??</b>", reply_markup=InlineKeyboardMarkup(btn))
-        return 
-        
+        btn = [
+            [InlineKeyboardButton('⚡️ Updates Channel ⚡️', url=UPDATES_LINK),
+             InlineKeyboardButton('💡 Support Group 💡', url=SUPPORT_LINK)]
+        ]
+        await message.reply(f"<b>Hey {user}, {wish}\nHow can I help you?</b>", 
+                            reply_markup=InlineKeyboardMarkup(btn))
+        return
+
+    # For Private Chats
     if not await db.is_user_exist(message.from_user.id):
         await db.add_user(message.from_user.id, message.from_user.first_name)
         await client.send_message(LOG_CHANNEL, script.NEW_USER_TXT.format(message.from_user.mention, message.from_user.id))
@@ -73,26 +87,26 @@ async def start(client, message):
     verify_status = await get_verify_status(message.from_user.id)
     if verify_status['is_verified'] and datetime.datetime.now() > verify_status['expire_time']:
         await update_verify_status(message.from_user.id, is_verified=False)
-    
-    if (len(message.command) != 2) or (len(message.command) == 2 and message.command[1] == 'start'):
-        buttons = [[
-            InlineKeyboardButton("+ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ +", url=f'http://t.me/{temp.U_NAME}?startgroup=true')
-                ],[
-                    InlineKeyboardButton('ℹ️ ᴜᴘᴅᴀᴛᴇs', url=UPDATES_LINK),
-                    InlineKeyboardButton('🧑‍💻 sᴜᴘᴘᴏʀᴛ', url=SUPPORT_LINK)
-                ],[
-                    InlineKeyboardButton('👨‍🚒 ʜᴇʟᴘ', callback_data='help'),
-                    InlineKeyboardButton('📚 ᴀʙᴏᴜᴛ', callback_data='about')
-                ],[
-                    InlineKeyboardButton('💰 ᴇᴀʀɴ ᴜɴʟɪᴍɪᴛᴇᴅ ᴍᴏɴᴇʏ ʙʏ ʙᴏᴛ 💰', callback_data='earn')
-                ]]
-        reply_markup = InlineKeyboardMarkup(buttons)
-        await message.reply_photo(
-            photo=random.choice(PICS),
-            caption=script.START_TXT.format(message.from_user.mention, get_wish()),
-            reply_markup=reply_markup,
-            parse_mode=enums.ParseMode.HTML
-        )
+
+    buttons = [
+        [InlineKeyboardButton("+ Add me to your group +", url=f'http://t.me/{client.me.username}?startgroup=true')],
+        [InlineKeyboardButton('ℹ️ Updates', url=UPDATES_LINK), InlineKeyboardButton('🧑‍💻 Support', url=SUPPORT_LINK)],
+        [InlineKeyboardButton('👨‍🚒 Help', callback_data='help'), InlineKeyboardButton('📚 About', callback_data='about')],
+        [InlineKeyboardButton('💰 Earn Unlimited Money 💰', callback_data='earn')]
+    ]
+    reply_markup = InlineKeyboardMarkup(buttons)
+    await message.reply_photo(
+        photo=random.choice(PICS),
+        caption=script.START_TXT.format(message.from_user.mention, get_wish()),
+        reply_markup=InlineKeyboardMarkup(buttons)
+    )
+
+
+@Client.on_message(filters.command("verify") & filters.incoming)
+async def verify(client, message):
+    verify_status = await get_verify_status(message.from_user.id)
+    if verify_status["is_verified"]:
+        await message.reply(f"✅ You are already verified until: {get_readable_time(VERIFY_EXPIRE)}")
         return
 
     if len(message.command) == 2 and message.command[1] == "plans":
@@ -252,8 +266,8 @@ async def start(client, message):
             InlineKeyboardButton('⁉️ ᴄʟᴏsᴇ ⁉️', callback_data='close_data')
         ]]
     await client.send_cached_media(
-        chat_id=message.from_user.id,
-        file_id=file_id,
+        chat_id=message.chat.id,
+        file_id=file.file_id,
         caption=f_caption,
         protect_content=settings['file_secure'],
         reply_markup=InlineKeyboardMarkup(btn)
@@ -737,4 +751,3 @@ async def remove_fsub(client, message):
         return
     await save_group_settings(grp_id, 'fsub', None)
     await message.reply_text("<b>Successfully removed your force channel id...</b>")
-
