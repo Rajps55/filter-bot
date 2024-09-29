@@ -1,3 +1,4 @@
+
 import random
 import asyncio
 import re
@@ -8,6 +9,7 @@ import math
 from pyrogram.errors.exceptions.bad_request_400 import MediaEmpty, PhotoInvalidDimensions, WebpageMediaEmpty
 from Script import script
 from datetime import datetime, timedelta
+import pyrogram
 from info import STICKERS_IDS, ADMINS, URL, MAX_BTN, BIN_CHANNEL, IS_STREAM, DELETE_TIME, FILMS_LINK, AUTH_CHANNEL, IS_VERIFY, VERIFY_EXPIRE, LOG_CHANNEL, SUPPORT_GROUP, SUPPORT_LINK, UPDATES_LINK, PICS, PROTECT_CONTENT, IMDB, AUTO_FILTER, SPELL_CHECK, IMDB_TEMPLATE, AUTO_DELETE, LANGUAGES, IS_FSUB, PAYMENT_QR, GROUP_FSUB, PM_SEARCH, QUALITY, OWNER_UPI_ID, OWNER_USERNAME
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ChatPermissions, InputMediaPhoto
 from pyrogram import Client, filters, enums
@@ -187,12 +189,12 @@ async def next_page(bot, query):
     if n_offset == 0:
         btn.append(
             [InlineKeyboardButton("« ʙᴀᴄᴋ", callback_data=f"next_{req}_{key}_{off_set}"),
-             InlineKeyboardButton(f"{math.ceil(int(offset) / MAX_BTN) + 1}/{math.ceil(total / MAX_BTN)}", callback_data="buttons")]
+            InlineKeyboardButton(f"{math.ceil(int(offset) / MAX_BTN) + 1}/{math.ceil(total / MAX_BTN)}", callback_data="buttons")]
         )
     elif off_set is None:
         btn.append(
             [InlineKeyboardButton(f"{math.ceil(int(offset) / MAX_BTN) + 1}/{math.ceil(total / MAX_BTN)}", callback_data="buttons"),
-             InlineKeyboardButton("ɴᴇxᴛ »", callback_data=f"next_{req}_{key}_{n_offset}")])
+            InlineKeyboardButton("ɴᴇxᴛ »", callback_data=f"next_{req}_{key}_{n_offset}")])
     else:
         btn.append(
             [
@@ -200,7 +202,7 @@ async def next_page(bot, query):
                 InlineKeyboardButton(f"{math.ceil(int(offset) / MAX_BTN) + 1}/{math.ceil(total / MAX_BTN)}", callback_data="buttons"),
                 InlineKeyboardButton("ɴᴇxᴛ »", callback_data=f"next_{req}_{key}_{n_offset}")
             ]
-        )
+        )    
     await query.message.edit_text(cap + files_link + del_msg, reply_markup=InlineKeyboardMarkup(btn), disable_web_page_preview=True, parse_mode=enums.ParseMode.HTML)
 
 @Client.on_callback_query(filters.regex(r"^languages"))
@@ -290,12 +292,10 @@ async def lang_next_page(bot, query):
     ident, req, key, lang, l_offset, offset = query.data.split("#")
     if int(req) != query.from_user.id:
         return await query.answer(f"Hello {query.from_user.first_name},\nDon't Click Other Results!", show_alert=True)
-
     try:
         l_offset = int(l_offset)
     except:
         l_offset = 0
-
     search = BUTTONS.get(key)
     cap = CAP.get(key)
     settings = await get_settings(query.message.chat.id)
@@ -311,9 +311,7 @@ async def lang_next_page(bot, query):
         n_offset = int(n_offset)
     except:
         n_offset = 0
-
     files_link = ''
-
     if settings['links']:
         btn = []
         for file_num, file in enumerate(files, start=l_offset+1):
@@ -488,7 +486,6 @@ async def advantage_spoll_choker(bot, query):
     _, id, user = query.data.split('#')
     if int(user) != 0 and query.from_user.id != int(user):
         return await query.answer(f"Hello {query.from_user.first_name},\nDon't Click Other Results!", show_alert=True)
-
     movie = await get_poster(id, id=True)
     search = movie.get('title')
     s = await query.message.edit_text(f"<b><i><code>{search}</code> Check In My Database...</i></b>")
@@ -576,7 +573,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
         ident, mc = query.data.split("#")
         settings = await get_settings(int(mc.split("_", 2)[1]))
         btn = await is_subscribed(client, query, settings['fsub'])
-        
         if btn:
             await query.answer(f"Hello {query.from_user.first_name},\nPlease join my updates channel and try again.", show_alert=True)
             btn.append(
@@ -584,7 +580,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
             )
             await query.edit_message_reply_markup(reply_markup=InlineKeyboardMarkup(btn))
             return
-        
         await query.answer(url=f"https://t.me/{temp.U_NAME}?start={mc}")
         await query.message.delete()
 
@@ -827,7 +822,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
             await query.answer(f"Hello {query.from_user.first_name},\nSend New Request Again!", show_alert=True)
             return        
         await query.answer(url=f"https://t.me/{temp.U_NAME}?start=all_{query.message.chat.id}_{key}")
-
 
     elif query.data == "unmute_all_members":
         if not await is_check_admin(client, query.message.chat.id, query.from_user.id):
@@ -1115,3 +1109,4 @@ async def advantage_spell_chok(message, s):
         await message.delete()
     except:
         pass
+
