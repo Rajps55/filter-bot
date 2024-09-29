@@ -47,7 +47,7 @@ IS_FSUB = is_enabled('IS_FSUB', True)
 SUPPORT_GROUP = int(get_env_or_exit('SUPPORT_GROUP', '-1002155777503'))
 
 # MongoDB Information
-DATABASE_URL = get_env_or_exit('DATABASE_URL', "mongodb+srv://your-connection-url")
+DATABASE_URL = get_env_or_exit('DATABASE_URL', "mongodb+srv://ayushpritysingh098:z0aMVL9ofTSOGqir@cluster0.9r9gs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 DATABASE_NAME = environ.get('DATABASE_NAME', 'Cluster0')
 COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Files')
 
