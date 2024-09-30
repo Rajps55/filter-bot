@@ -1,4 +1,3 @@
-import asyncio
 from pyrogram import Client
 from database.ia_filterdb import Media
 from aiohttp import web
@@ -101,10 +100,9 @@ class Bot(Client):
 
 app = Bot()
 
-while True:
-    try:
-        app.run()
-        break  # Exit loop if bot starts successfully
-    except FloodWait as e:
-        print(f"FloodWait triggered. Waiting for {e.value} seconds.")
-        asyncio.run(asyncio.sleep(e.value))  # Wait for the specified time
+try:
+    app.run()
+except FloodWait as e:
+    print(f"FloodWait triggered. Waiting for {e.x} seconds.")
+    asyncio.sleep(e.x)  # Wait for the specified time
+    app.run()  # Retry after the wait time
