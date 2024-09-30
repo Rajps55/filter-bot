@@ -73,7 +73,9 @@ VERIFY_EXPIRE = int(environ.get('VERIFY_EXPIRE', 86400))
 WELCOME_TEXT = environ.get('WELCOME_TEXT', script.WELCOME_TEXT)
 PM_FILE_DELETE_TIME = int(environ.get('PM_FILE_DELETE_TIME', 3600))
 INDEX_EXTENSIONS = [ext.lower() for ext in environ.get('INDEX_EXTENSIONS', 'mp4 mkv').split()]
-STICKERS_IDS = environ.get('STICKERS_IDS', '🍌').split() # CAACAgUAAxkBAAJ-dGb5YVm8l-qU7K_awyk1a7lHEgmQAAIrCgADAWhU63GjQhJebuA2BA').split()
+STICKERS_IDS = (
+    "CAACAgQAAxkBAAEK99dlfC7LDqnuwtGRkIoacot_dGC4zQACbg8AAuHqsVDaMQeY6CcRojME CAACAgQAAxkBAAELqxll8CcG-MZx9mIOXgaHSzLc9uyxswACaxQAAlrdEVOJDG3cIZuWLzQE"
+).split()
 
 # Boolean Settings
 GROUP_FSUB = is_enabled('GROUP_FSUB', False)
