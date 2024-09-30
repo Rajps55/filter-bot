@@ -1,16 +1,11 @@
 import os
-import re
-import json
-import base64
-import sys
-from shortzy import Shortzy
-from telegraph import upload_file
 import time
 import random, string
 import asyncio
 import datetime
 import requests 
 from time import time as time_now
+from telegraph import upload_file
 from pyrogram import Client, filters, enums 
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup 
 from pyrogram.errors import FloodWait 
@@ -211,26 +206,15 @@ async def start(client, message):
                     InlineKeyboardButton('⁉️ ᴄʟᴏsᴇ ⁉️', callback_data='close_data')
                 ]]
 
-            msg = await client.send_cached_media(
+            await client.send_cached_media(
                 chat_id=message.from_user.id,
                 file_id=file.file_id,
                 caption=f_caption,
                 protect_content=settings['file_secure'],
                 reply_markup=InlineKeyboardMarkup(btn)
             )
-            file_ids.append(msg.id)
-
-        time = get_readable_time(PM_FILE_DELETE_TIME)
-        vp = await message.reply(f"Nᴏᴛᴇ: Tʜɪs ғɪʟᴇs ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇ ɪɴ {time} ᴛᴏ ᴀᴠᴏɪᴅ ᴄᴏᴘʏʀɪɢʜᴛs. Sᴀᴠᴇ ᴛʜᴇ ғɪʟᴇs ᴛᴏ sᴏᴍᴇᴡʜᴇʀᴇ ᴇʟsᴇ")
-        await asyncio.sleep(PM_FILE_DELETE_TIME)
-        buttons = [[InlineKeyboardButton('ɢᴇᴛ ғɪʟᴇs ᴀɢᴀɪɴ', callback_data=f"get_del_send_all_files#{grp_id}#{key}")]] 
-        await client.delete_messages(
-            chat_id=message.chat.id,
-            message_ids=file_ids + [total_files.id]
-        )
-        await vp.edit("Tʜᴇ ғɪʟᴇ ʜᴀs ʙᴇᴇɴ ɢᴏɴᴇ ! Cʟɪᴄᴋ ɢɪᴠᴇɴ ʙᴜᴛᴛᴏɴ ᴛᴏ ɢᴇᴛ ɪᴛ ᴀɢᴀɪɴ.", reply_markup=InlineKeyboardMarkup(buttons))
-        return
-
+        return    
+            
     type_, grp_id, file_id = mc.split("_", 2)
     files_ = await get_file_details(file_id)
     if not files_:
@@ -247,6 +231,8 @@ async def start(client, message):
             ]]
             await message.reply(f"[{get_size(files.file_size)}] {files.file_name}\n\nYour file is ready, Please get using this link. 👍", reply_markup=InlineKeyboardMarkup(btn), protect_content=True)
             return
+    else:
+        pass
             
     CAPTION = settings['caption']
     f_caption = CAPTION.format(
@@ -270,32 +256,21 @@ async def start(client, message):
         ],[
             InlineKeyboardButton('⁉️ ᴄʟᴏsᴇ ⁉️', callback_data='close_data')
         ]]
-    vp = await client.send_cached_media(
+    await client.send_cached_media(
         chat_id=message.chat.id,
         file_id=file_id,
         caption=f_caption,
         protect_content=settings['file_secure'],
         reply_markup=InlineKeyboardMarkup(btn)
     )
-    time = get_readable_time(PM_FILE_DELETE_TIME)
-    msg = await vp.reply(f"Nᴏᴛᴇ: Tʜɪs ᴍᴇssᴀɢᴇ ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇ ɪɴ {time} ᴛᴏ ᴀᴠᴏɪᴅ ᴄᴏᴘʏʀɪɢʜᴛs. Sᴀᴠᴇ ᴛʜᴇ ғɪʟᴇ ᴛᴏ sᴏᴍᴇᴡʜᴇʀᴇ ᴇʟsᴇ")
-    await asyncio.sleep(PM_FILE_DELETE_TIME)
-    btns = [[
-        InlineKeyboardButton('ɢᴇᴛ ғɪʟᴇ ᴀɢᴀɪɴ', callback_data=f"get_del_file#{grp_id}#{file_id}")
-    ]]
-    await msg.delete()
-    await vp.delete()
-    await vp.reply("Tʜᴇ ғɪʟᴇ ʜᴀs ʙᴇᴇɴ ɢᴏɴᴇ ! Cʟɪᴄᴋ ɢɪᴠᴇɴ ʙᴜᴛᴛᴏɴ ᴛᴏ ɢᴇᴛ ɪᴛ ᴀɢᴀɪɴ.", reply_markup=InlineKeyboardMarkup(btns))
-
-@Client.on_message(filters.command('index_channels'))
+    
+@Client.on_message(filters.command('index_channels') & filters.user(ADMINS))
 async def channels_info(bot, message):
-    user_id = message.from_user.id
-    if user_id not in ADMINS:
-        await message.delete()
-        return
+    """Send basic information of index channels"""
     ids = INDEX_CHANNELS
     if not ids:
         return await message.reply("Not set INDEX_CHANNELS")
+
     text = '**Indexed Channels:**\n\n'
     for id in ids:
         chat = await bot.get_chat(id)
@@ -303,21 +278,16 @@ async def channels_info(bot, message):
     text += f'\n**Total:** {len(ids)}'
     await message.reply(text)
 
-@Client.on_message(filters.command('stats'))
+@Client.on_message(filters.command('stats') & filters.user(ADMINS))
 async def stats(bot, message):
-    user_id = message.from_user.id
-    if user_id not in ADMINS:
-        await message.delete()
-        return
+    msg = await message.reply('Please Wait...')
     files = await Media.count_documents()
     users = await db.total_users_count()
     chats = await db.total_chat_count()
-    premium = await db.all_premium_users()
     u_size = get_size(await db.get_db_size())
-    u_size_int = await db.get_db_size()
-    f_size = get_size(536870912 - u_size_int)
-    uptime = get_readable_time(time_now() - temp.START_TIME)
-    await message.reply_text(script.STATUS_TXT.format(files, users, chats, premium, u_size, f_size, uptime))    
+    f_size = get_size(536870912 - await db.get_db_size())
+    uptime = get_readable_time(time.time() - temp.START_TIME)
+    await msg.edit(script.STATUS_TXT.format(files, users, chats, u_size, f_size, uptime))   
     
 @Client.on_message(filters.command('settings'))
 async def settings(client, message):
