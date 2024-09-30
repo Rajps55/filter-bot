@@ -106,7 +106,7 @@ async def start(client, message):
         await message.reply_photo(
         photo=random.choice(PICS),
         caption=script.START_TXT.format(message.from_user.mention, get_wish()),
-        reply_markup=InlineKeyboardMarkup(buttons),
+        reply_markup=reply_markup,
         parse_mode=enums.ParseMode.HTML
         )
         return
@@ -156,10 +156,11 @@ async def start(client, message):
             ]]
             await message.reply("You not verified today! Kindly verify now. 🔐", reply_markup=InlineKeyboardMarkup(btn), protect_content=True)
             return
+    else:
+        pass
 
     settings = await get_settings(int(mc.split("_", 2)[1]))
-    if not await db.has_premium_access(message.from_user.id):
-        if settings['fsub']:
+    if settings['fsub']:
             btn = await is_subscribed(client, message, settings['fsub'])
             if btn:
                 btn.append(
@@ -229,7 +230,7 @@ async def start(client, message):
             ],[
                 InlineKeyboardButton("📍 ʜᴏᴡ ᴛᴏ ᴏᴘᴇɴ ʟɪɴᴋ 📍", url=settings['tutorial'])
             ]]
-            await message.reply(f"[{get_size(files.file_size)}] {files.file_name}\n\nYour file is ready, Please get using this link. 👍", reply_markup=InlineKeyboardMarkup(btn), protect_content=True)
+            await message.reply(f"[{get_size(files.file_size)}] {files.file_name}\n\nYour file is ready, Please get using this link. 👍", reply_markup=InlineKeyboardMarkup(btn), protect_content=settings['file_secure'])
             return
     else:
         pass
