@@ -1,15 +1,20 @@
 import os
+import re
+import json
+import base64
+import sys
+from shortzy import Shortzy
+from telegraph import upload_file
 import time
 import random, string
 import asyncio
 import datetime
 import requests 
 from time import time as time_now
-from telegraph import upload_file
 from pyrogram import Client, filters, enums 
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup 
 from pyrogram.errors import FloodWait 
-from database.ia_filterdb import Media, delete_files, get_file_details
+from database.ia_filterdb import Media, get_file_details, unpack_new_file_id, delete_files
 from database.users_chats_db import db
 from utils import (
     get_seconds, get_settings, get_size, get_verify_status, is_check_admin, save_group_settings, temp, 
@@ -267,7 +272,7 @@ async def start(client, message):
         ]]
     vp = await client.send_cached_media(
         chat_id=message.chat.id,
-        file_ids=file.file_ids,
+        file_id=file_id,
         caption=f_caption,
         protect_content=settings['file_secure'],
         reply_markup=InlineKeyboardMarkup(btn)
