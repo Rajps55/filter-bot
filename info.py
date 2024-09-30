@@ -55,7 +55,7 @@ COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Files')
 SUPPORT_LINK = environ.get('SUPPORT_LINK', 'https://t.me/Netfilix_movie_shaport')
 OWNER_USERNAME = environ.get('OWNER_USERNAME', 'https://t.me/Hansaka_Anuhas')
 UPDATES_LINK = environ.get('UPDATES_LINK', 'https://t.me/+Ie4mNf6lL5RjYjM1')
-FILMS_LINK = environ.get('FILMS_LINK', 'https://t.me/n_flixmovie')
+FILMS_LINK = environ.get('FILMS_LINK', 'https://t.me/+U59IwGfBP8FjNzE1')
 TUTORIAL = environ.get('TUTORIAL', 'https://t.me/APSmo/7')
 VERIFY_TUTORIAL = environ.get('VERIFY_TUTORIAL', '')
 
