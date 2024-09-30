@@ -5,7 +5,7 @@ import math
 from pyrogram.errors.exceptions.bad_request_400 import MediaEmpty, PhotoInvalidDimensions, WebpageMediaEmpty
 from Script import script
 from datetime import datetime, timedelta
-from info import STICKERS_IDS, ADMINS, URL, MAX_BTN, BIN_CHANNEL, IS_STREAM, DELETE_TIME, FILMS_LINK, AUTH_CHANNEL, IS_VERIFY, VERIFY_EXPIRE, LOG_CHANNEL, SUPPORT_GROUP, SUPPORT_LINK, UPDATES_LINK, PICS, PROTECT_CONTENT, IMDB, AUTO_FILTER, SPELL_CHECK, IMDB_TEMPLATE, AUTO_DELETE, LANGUAGES, IS_FSUB, PAYMENT_QR, GROUP_FSUB, PM_SEARCH, UPI_ID
+from info import STICKERS_IDS, ADMINS, URL, MAX_BTN, BIN_CHANNEL, IS_STREAM, DELETE_TIME, FILMS_LINK, AUTH_CHANNEL, IS_VERIFY, VERIFY_EXPIRE, LOG_CHANNEL, SUPPORT_GROUP, SUPPORT_LINK, UPDATES_LINK, PICS, PROTECT_CONTENT, IMDB, AUTO_FILTER, SPELL_CHECK, IMDB_TEMPLATE, AUTO_DELETE, LANGUAGES, IS_FSUB, PAYMENT_QR, GROUP_FSUB, PM_SEARCH, OWNER_OWNER_UPI_ID
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ChatPermissions, InputMediaPhoto
 from pyrogram import Client, filters, enums
 from pyrogram.errors import FloodWait, UserIsBlocked, MessageNotModified, PeerIdInvalid, ChatAdminRequired
@@ -407,7 +407,7 @@ async def upi_payment_info(client, callback_query):
     )
     
     await cmd.edit(
-        f"<b>👋 ʜᴇʏ {cmd.from_user.mention},\n    \n⚜️ ᴘᴀʏ ᴀᴍᴍᴏᴜɴᴛ ᴀᴄᴄᴏʀᴅɪɴɢ ᴛᴏ ʏᴏᴜʀ ᴘʟᴀɴ ᴀɴᴅ ᴇɴᴊᴏʏ ᴘʀᴇᴍɪᴜᴍ ᴍᴇᴍʙᴇʀꜱʜɪᴘ !\n\n💵 ᴜᴘɪ ɪᴅ - <code>{UPI_ID}</code>\n\n‼️ ᴍᴜsᴛ sᴇɴᴅ sᴄʀᴇᴇɴsʜᴏᴛ ᴀғᴛᴇʀ ᴘᴀʏᴍᴇɴᴛ.</b>",
+        f"<b>👋 ʜᴇʏ {cmd.from_user.mention},\n    \n⚜️ ᴘᴀʏ ᴀᴍᴍᴏᴜɴᴛ ᴀᴄᴄᴏʀᴅɪɴɢ ᴛᴏ ʏᴏᴜʀ ᴘʟᴀɴ ᴀɴᴅ ᴇɴᴊᴏʏ ᴘʀᴇᴍɪᴜᴍ ᴍᴇᴍʙᴇʀꜱʜɪᴘ !\n\n💵 ᴜᴘɪ ɪᴅ - <code>{OWNER_UPI_ID}</code>\n\n‼️ ᴍᴜsᴛ sᴇɴᴅ sᴄʀᴇᴇɴsʜᴏᴛ ᴀғᴛᴇʀ ᴘᴀʏᴍᴇɴᴛ.</b>",
         reply_markup = reply_markup
     )
 
@@ -436,7 +436,7 @@ async def qr_code_info(client, callback_query):
             
 
 @Client.on_callback_query(filters.regex(r"^upiid_info"))
-async def upi_id_info(client, callback_query):
+async def OWNER_UPI_ID_info(client, callback_query):
     cmd = callback_query.message
     btn = [[            
         InlineKeyboardButton("ᴘᴀʏᴍᴇɴᴛ ʀᴇᴄᴇɪᴘᴛ ʜᴇʀᴇ 🧾", user_id=admin)
@@ -448,7 +448,7 @@ async def upi_id_info(client, callback_query):
     )
     reply_markup = InlineKeyboardMarkup(btn)
     await cmd.edit(
-        f"<b>👋 ʜᴇʏ {cmd.from_user.mention},\n      \n⚜️ ᴘᴀʏ ᴀᴍᴍᴏᴜɴᴛ ᴀᴄᴄᴏʀᴅɪɴɢ ᴛᴏ ʏᴏᴜʀ ᴘʟᴀɴ ᴀɴᴅ ᴇɴᴊᴏʏ ᴘʀᴇᴍɪᴜᴍ ᴍᴇᴍʙᴇʀꜱʜɪᴘ !\n\n‼️ ᴍᴜsᴛ sᴇɴᴅ sᴄʀᴇᴇɴsʜᴏᴛ ᴀғᴛᴇʀ ᴘᴀʏᴍᴇɴᴛ.</b>\n\n💵 <code>{UPI_ID}</code>",
+        f"<b>👋 ʜᴇʏ {cmd.from_user.mention},\n      \n⚜️ ᴘᴀʏ ᴀᴍᴍᴏᴜɴᴛ ᴀᴄᴄᴏʀᴅɪɴɢ ᴛᴏ ʏᴏᴜʀ ᴘʟᴀɴ ᴀɴᴅ ᴇɴᴊᴏʏ ᴘʀᴇᴍɪᴜᴍ ᴍᴇᴍʙᴇʀꜱʜɪᴘ !\n\n‼️ ᴍᴜsᴛ sᴇɴᴅ sᴄʀᴇᴇɴsʜᴏᴛ ᴀғᴛᴇʀ ᴘᴀʏᴍᴇɴᴛ.</b>\n\n💵 <code>{OWNER_UPI_ID}</code>",
         disable_web_page_preview=True,
         reply_markup=reply_markup
     )
@@ -861,7 +861,7 @@ async def handle_callback_query(client, query):
         reply_markup = InlineKeyboardMarkup(btn)
         await query.message.edit_media(
             InputMediaPhoto(media=PAYMENT_QR,
-                caption=script.PREMIUM_PLAN_TEXT.format(OWNER_UPI_ID)
+                caption=script.PREMIUM_PLAN_TEXT.format(OWNER_OWNER_UPI_ID)
             )
         )
         await query.message.edit_reply_markup(
