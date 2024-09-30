@@ -1,15 +1,15 @@
 import os
 import time
-from telegraph import upload_file # type: ignore
 import random, string
 import asyncio
 import datetime
-import requests # type: ignore
+import requests 
 from time import time as time_now
-from pyrogram import Client, filters, enums # type: ignore
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup # type: ignore
-from pyrogram.errors import FloodWait # type: ignore
-from database.ia_filterdb import Media, delete_files, get_file_details, unpack_new_file_id
+from telegraph import upload_file
+from pyrogram import Client, filters, enums 
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup 
+from pyrogram.errors import FloodWait 
+from database.ia_filterdb import Media, delete_files, get_file_details
 from database.users_chats_db import db
 from utils import (
     get_seconds, get_settings, get_size, get_verify_status, is_check_admin, save_group_settings, temp, 
@@ -92,10 +92,15 @@ async def start(client, message):
         
     if (len(message.command) != 2) or (len(message.command) == 2 and message.command[1] == 'start'):
         buttons = [[
-        [InlineKeyboardButton("+ Add me to your group +", url=f'http://t.me/{client.me.username}?startgroup=true')],
-        [InlineKeyboardButton('ℹ️ Updates', url=UPDATES_LINK), InlineKeyboardButton('🧑‍💻 Support', url=SUPPORT_LINK)],
-        [InlineKeyboardButton('👨‍🚒 Help', callback_data='help'), InlineKeyboardButton('📚 About', callback_data='about')],
-        [InlineKeyboardButton('💰 Earn Unlimited Money 💰', callback_data='earn')]
+            InlineKeyboardButton("+ ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ +", url=f'http://t.me/{temp.U_NAME}?startgroup=start')
+        ],[
+            InlineKeyboardButton('ℹ️ ᴜᴘᴅᴀᴛᴇs', url=UPDATES_LINK),
+            InlineKeyboardButton('🧑‍💻 sᴜᴘᴘᴏʀᴛ', url=SUPPORT_LINK)
+        ],[
+            InlineKeyboardButton('👨‍🚒 ʜᴇʟᴘ', callback_data='help'),
+            InlineKeyboardButton('📚 ᴀʙᴏᴜᴛ', callback_data='about')
+        ],[
+            InlineKeyboardButton('💰 ᴇᴀʀɴ ᴜɴʟɪᴍɪᴛᴇᴅ ᴍᴏɴᴇʏ ʙʏ ʙᴏᴛ 💰', callback_data='earn')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
         await message.reply_photo(
